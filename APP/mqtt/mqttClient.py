@@ -2,8 +2,8 @@ import json
 import paho.mqtt.client as mqtt
 import time
 
-from ..firebase.firestoreService import updateLocation, createFall
-from ..config import *
+from APP.firebase.firestoreService import updateLocation, createFall
+from APP.config import *
 
 lastFall = {}
 
