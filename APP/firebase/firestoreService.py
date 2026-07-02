@@ -1,6 +1,6 @@
 from APP.firebase.firebaseClient import db
 from firebase_admin import firestore
-from config import DEVICES_COLLECTION, FALLS_COLLECTION, NOTIFICATIONS_COLLECTION, USERS_COLLECTION
+from APP.config import DEVICES_COLLECTION, FALLS_COLLECTION, NOTIFICATIONS_COLLECTION, USERS_COLLECTION
 
 def updateLocation(deviceId, lat, lng):
     try:
