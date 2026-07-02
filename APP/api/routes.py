@@ -1,17 +1,11 @@
 from fastapi import APIRouter
 from fastapi import Depends
 
-try:
-    from ..api.schema import PairDeviceRequest, UnpairDeviceRequest, AddContactRequest
-    from ..firebase.firestoreService import getDevice, pairDevice, isDeviceOwner, getContact, deleteContact, getNotification, getNotifications, markNotificationRead, getUserDevice, addContact, unpairDevice
+from APP.api.schema import PairDeviceRequest, UnpairDeviceRequest, AddContactRequest
+from APP.firebase.firestoreService import getDevice, pairDevice, isDeviceOwner, getContact, deleteContact, getNotification, getNotifications, markNotificationRead, getUserDevice, addContact, unpairDevice
 
-    from ..auth.auth import get_current_user_id
+from APP.auth.auth import get_current_user_id
 
-except ImportError:
-    from api.schema import PairDeviceRequest, UnpairDeviceRequest, AddContactRequest
-    from firebase.firestoreService import getDevice, pairDevice, isDeviceOwner, getContact, deleteContact, getNotification, getNotifications, markNotificationRead, getUserDevice, addContact, unpairDevice
-
-    from    auth.auth import get_current_user_id
 
 router = APIRouter()
 
