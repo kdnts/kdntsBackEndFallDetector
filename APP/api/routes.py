@@ -68,7 +68,9 @@ def unpair_device(request: UnpairDeviceRequest):
     return {"success": True, "data": {"message": "Device unpaired"}}
 
 @router.post("/contacts")
-def add_contact(request: AddContactRequest):
+def add_contact(
+    request: AddContactRequest,
+    userId: str = Depends(get_current_user_id)):
 
     userId = request.userId.strip()
     if not userId:

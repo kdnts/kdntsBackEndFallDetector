@@ -9,7 +9,6 @@ class UnpairDeviceRequest(BaseModel):
     deviceId: str
 
 class AddContactRequest(BaseModel):
-    userId: str
     name: str
     phone:str
 

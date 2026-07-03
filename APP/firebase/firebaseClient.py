@@ -3,7 +3,7 @@ from firebase_admin import credentials, firestore
 import os
 import json
 
-service_account = json.loads(os.getenv("FIREBASE_SERVICE_ACCOUNT"))
+service_account = json.loads(os.getenv("FIREBASE_SERVICE_ACCOUNT")) #render will call FIREBASE_SERVICE_ACCOUNT
 
 cred = credentials.Certificate(service_account)
 
