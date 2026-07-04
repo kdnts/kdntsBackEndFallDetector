@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from fastapi import Depends
+from fastapi import Depends, Request
 
 from APP.api.schema import PairDeviceRequest, UnpairDeviceRequest, AddContactRequest
 from APP.firebase.firestoreService import getDevice, pairDevice, isDeviceOwner, getContact, deleteContact, getNotification, getNotifications, markNotificationRead, getUserDevice, addContact, unpairDevice
@@ -71,7 +71,14 @@ def unpair_device(request: UnpairDeviceRequest):
 @router.post("/contacts")
 def add_contact(
     request: AddContactRequest,
+    fastapi_request: Request,
     userId: str = Depends(get_current_user_id)):
+
+    # Debug: show whether Authorization header reached the server
+    auth_header = fastapi_request.headers.get("authorization")
+    print("add_contact: authorization header present:", auth_header is not None)
+    if auth_header:
+        print("add_contact: authorization header length:", len(auth_header))
 
     userId = userId.strip()
     if not userId:
@@ -87,6 +94,7 @@ def add_contact(
         
 
     result = addContact(userId, name, phone)
+    print("add_contact: addContact returned:", result)
 
     if not result:
         return {"success": False, "message": "Database error"}
