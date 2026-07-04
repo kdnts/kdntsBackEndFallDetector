@@ -7,7 +7,8 @@ from APP.api.routes import router
 app = FastAPI()
 app.include_router(router)
 
-if os.getenv("RENDER") != "true":
+# Start MQTT in background (on local or Render if DISABLE_MQTT is not set)
+if os.getenv("DISABLE_MQTT") != "true":
     # import mqtt client lazily to avoid import-time package issues
     from .mqtt.mqttClient import start_mqtt
 
