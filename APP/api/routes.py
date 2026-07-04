@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from fastapi import Depends, Request
+from fastapi import Depends
 
 from APP.api.schema import PairDeviceRequest, UnpairDeviceRequest, AddContactRequest
 from APP.firebase.firestoreService import getDevice, pairDevice, isDeviceOwner, getContact, deleteContact, getNotification, getNotifications, markNotificationRead, getUserDevice, addContact, unpairDevice
@@ -71,14 +71,7 @@ def unpair_device(request: UnpairDeviceRequest):
 @router.post("/contacts")
 def add_contact(
     request: AddContactRequest,
-    fastapi_request: Request,
     userId: str = Depends(get_current_user_id)):
-
-    # Debug: show whether Authorization header reached the server
-    auth_header = fastapi_request.headers.get("authorization")
-    print("add_contact: authorization header present:", auth_header is not None)
-    if auth_header:
-        print("add_contact: authorization header length:", len(auth_header))
 
     userId = userId.strip()
     if not userId:
@@ -94,7 +87,6 @@ def add_contact(
         
 
     result = addContact(userId, name, phone)
-    print("add_contact: addContact returned:", result)
 
     if not result:
         return {"success": False, "message": "Database error"}
@@ -111,7 +103,14 @@ def get_contact(userId):
     return {"success": True, "data": contacts}
 
 @router.delete("/contacts/{userId}/{contactId}")
-def delete_contact(userId, contactId):
+def delete_contact(
+    userId: str, 
+    contactId: str,
+    authUserId: str = Depends(get_current_user_id)):
+
+    # Validate token user matches path user
+    if authUserId != userId:
+        return {"success": False, "message": "Unauthorized"}
 
     if not userId.strip():
         return{"success": False, "message": "User Id required"}
