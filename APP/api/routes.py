@@ -3,6 +3,7 @@ from fastapi import Depends
 
 from APP.api.schema import PairDeviceRequest, UnpairDeviceRequest, AddContactRequest
 from APP.firebase.firestoreService import getDevice, pairDevice, isDeviceOwner, getContact, deleteContact, getNotification, getNotifications, markNotificationRead, getUserDevice, addContact, unpairDevice
+from APP.mqtt.mqttClient import publishContact
 
 from APP.auth.auth import get_current_user_id
 
@@ -154,3 +155,36 @@ def get_user_device(userId):
         return {"success": False, "message": "No device paired"}
     
     return {"success": True, "data": device}
+
+@router.post("contacts/sync")
+def sync_contact(userId: str = Depends(get_current_user_id)):
+
+    #get contacts from firestore
+    contacts = getContact(userId)
+
+    if not contacts:
+        return {"success": False, "message": "No contacts found"}
+
+    #get device
+    device = getUserDevice(userId)
+
+    if device is None:
+        return {"success": False, "message": "No device found"}
+
+    deviceId = device["deviceId"]
+
+    #extract phones
+    phones = []
+
+    for c in contacts:
+        phone = c.get("phone")
+        if phone:
+            phone.append(phone)
+
+    #publish MQTT
+    result = publishContact(deviceId, phones)
+
+    if not result:
+        return {"success": False, "message": "MQTT publish failed"}
+
+    return {"success": True,"data": {"message": "Contacts synced","count": len(phones)}}

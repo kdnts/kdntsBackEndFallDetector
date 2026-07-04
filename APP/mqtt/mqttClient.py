@@ -7,6 +7,8 @@ from APP.config import *
 
 lastFall = {}
 
+mqtt_client = None
+
 def on_connect(client, userdata, flags, rc, properties = None):
     print("MQTT connect")
 
@@ -89,14 +91,49 @@ def on_message(client, userdata, msg):
         print("\nCalling createFall")
         createFall(deviceId, lat, lng)
 
+def publishContact(deviceId, phones):
+        global mqtt_client
+
+        if mqtt_client is None:
+            print("MQTT client not init")
+            return False
+        
+        if not mqtt_client.is_connected():
+            print("MQTT not connected")
+            return False
+        
+        topic = f"devices/{deviceId}/contact"
+
+        payload = {
+            "phones": phones
+        }
+
+        try:
+            mqtt_client.publish(
+                topic,
+                json.dumps(payload),
+                qos=0,
+                retain=False
+            )
+
+            print(f"[MQTT] Published contacts to {topic}")
+            return True
+
+        except Exception as e:
+            print("[MQTT] publishContacts error:", e)
+            return False
+
 def start_mqtt():
+
+    global mqtt_client
+
     print("start_mqtt called")
     
-    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+    mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 
-    client.on_connect = on_connect
-    client.on_message = on_message
+    mqtt_client.on_connect = on_connect
+    mqtt_client.on_message = on_message
 
-    client.connect(MQTT_BROKER, MQTT_PORT, 60)
+    mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
 
-    client.loop_forever()
+    mqtt_client.loop_forever()
