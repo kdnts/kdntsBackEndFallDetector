@@ -73,9 +73,9 @@ def add_contact(
     request: AddContactRequest,
     userId: str = Depends(get_current_user_id)):
 
-    userId = request.userId.strip()
+    userId = userId.strip()
     if not userId:
-        return{"success": False, "message": "User Id required"}
+        return {"success": False, "message": "User Id required"}
 
     name = request.name.strip()
     if not name:
@@ -86,7 +86,7 @@ def add_contact(
         return {"success": False, "message": "Phone required"}
         
 
-    result = addContact(request.userId, name, phone)
+    result = addContact(userId, name, phone)
 
     if not result:
         return {"success": False, "message": "Database error"}
@@ -156,7 +156,7 @@ def get_user_device(userId):
     
     return {"success": True, "data": device}
 
-@router.post("contacts/sync")
+@router.post("/contacts/sync")
 def sync_contact(userId: str = Depends(get_current_user_id)):
 
     #get contacts from firestore
@@ -179,7 +179,7 @@ def sync_contact(userId: str = Depends(get_current_user_id)):
     for c in contacts:
         phone = c.get("phone")
         if phone:
-            phone.append(phone)
+            phones.append(phone)
 
     #publish MQTT
     result = publishContact(deviceId, phones)
